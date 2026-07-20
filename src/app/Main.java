@@ -2,112 +2,107 @@ package app;
 import java.util.*;
 
 public class Main {
-    byte min = -100;
-    byte max = 100;
-    int[] numbers = new int[20];
-
     public static void main(String[] args) {
-        Main main = new Main();
+        byte min = 1;
+        byte max = 100;
+        int[] numbers = new int[15];
 
-        main.fillArrayWithRandoms();
-        System.out.println("Array of random numbers: " + Arrays.toString(main.numbers));
+        fillArrayWithRandoms(numbers, min, max);
+        System.out.println("Start array: " + Arrays.toString(numbers));
 
-        int sumOfNegatives = main.countNegatives();
-        System.out.printf("Sum of negatives: %d%n", sumOfNegatives);
+        sortInsertion(numbers);
+        System.out.println("Sorted array: " + Arrays.toString(numbers));
 
-        Map<String, Integer> evenAndOdd = main.countQuantityOfOddsAndEvens();
-        System.out.printf("Quantity on even numbers: %d%n", evenAndOdd.get("even"));
-        System.out.printf("Quantity on odd numbers: %d%n", evenAndOdd.get("odd"));
+        Scanner scanner = new Scanner(System.in);
 
-        Map<String, Integer> minAndMaxValues = main.findMinAndMaxValue();
-        System.out.printf("Min value: %d (with index: %d) %n", minAndMaxValues.get("min"), minAndMaxValues.get("minIndex"));
-        System.out.printf("Max value: %d (with index: %d) %n", minAndMaxValues.get("max"), minAndMaxValues.get("maxIndex"));
+        while (true) {
+            try {
+                System.out.println("Enter value from " + min + " to " + max + " for search: ");
+                int searchKey = scanner.nextInt();
+                scanner.nextLine();
 
-        double average = main.countAverageAfterFirstNegative();
-        System.out.printf("Average after first negative value: %.2f", average);
+                if (searchKey > max || searchKey < min) {
+                    System.out.println("Entered not valid value!");
+                } else {
+                    int index = searchValue(numbers, searchKey);
+
+                    if (index != -1) {
+                        System.out.println("Index for number " + searchKey + " in sorted array is: " + index);
+                        return;
+                    }
+
+                    System.out.println("Number " + searchKey + " is not found in array!");
+
+                    while (true) {
+                       System.out.println("Want to try one more time? Y/N");
+                       String userResponse = scanner.nextLine().trim();
+
+                       if (userResponse.equalsIgnoreCase("y")) {
+                           break;
+                       }
+
+                       if (userResponse.equalsIgnoreCase("n")) {
+                           scanner.close();
+                           return;
+                       }
+
+                        System.out.println("Please enter Y or N.");
+                       }
+                    }
+                }
+            catch (InputMismatchException e) {
+                System.out.println("Please enter an integer number.");
+                scanner.nextLine();
+            }
+        }
     }
 
-    public void fillArrayWithRandoms() {
+    public static void fillArrayWithRandoms(int[] array, int min, int max) {
         int count = 0;
-        while (count < numbers.length) {
+        while (count < array.length) {
             int randomNumber = (min + (int) (Math.random() * ((max - min) + 1)));
-            if (!contains(randomNumber)) {
-                numbers[count] = randomNumber;
+            if (!contains(randomNumber, array)) {
+                array[count] = randomNumber;
                 count++;
             }
         }
     }
 
-    public int countNegatives() {
-        int result = 0;
-        for (int i = 0; i < numbers.length; i++) {
-            if (numbers[i] < 0) {
-                result += numbers[i];
+    public static int searchValue(int[] array, int key) {
+        int left = 0;
+        int right = array.length - 1;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+
+            if (array[mid] == key) {
+                return mid;
             }
-        }
-        return result;
-    }
 
-    public Map<String, Integer> countQuantityOfOddsAndEvens() {
-        HashMap<String, Integer> resultMap = new HashMap<>();
-        resultMap.put("odd", 0);
-        resultMap.put("even", 0);
-
-        for (int i = 0; i < numbers.length; i++) {
-            if (numbers[i] % 2 != 0) {
-                resultMap.merge("odd", 1, Integer::sum);
+            if (array[mid] < key) {
+                left = mid + 1;
             } else {
-                resultMap.merge("even", 1, Integer::sum);
+                right = mid - 1;
             }
         }
-
-        return resultMap;
+        return -1;
     }
 
-    public Map<String, Integer> findMinAndMaxValue() {
-        HashMap<String, Integer> resultMap = new HashMap<>();
-        resultMap.put("min", numbers[0]);
-        resultMap.put("max", numbers[0]);
-        resultMap.put("minIndex", 0);
-        resultMap.put("maxIndex", 0);
+    public static void sortInsertion(int[] array) {
+        for (int i = 1; i < array.length; i++) {
+            int current = array[i];
+            int j = i - 1;
 
-        for (int i = 1; i < numbers.length; i++) {
-            if (numbers[i] < resultMap.get("min")) {
-                resultMap.put("min", numbers[i]);
-                resultMap.put("minIndex", i);
-            } else if (numbers[i] > resultMap.get("max")) {
-                resultMap.put("max", numbers[i]);
-                resultMap.put("maxIndex", i);
+            while (j >= 0 && array[j] > current) {
+                array[j+1] = array[j];
+                j = j - 1;
             }
+            array[j+1] = current;
         }
-        return resultMap;
     }
 
-    public double countAverageAfterFirstNegative() {
-        double result = 0;
-        int index = -1;
-
-        for (int i = 0; i < numbers.length; i++) {
-            if (numbers[i] < 0) {
-                index = i + 1;
-                break;
-            }
-        }
-
-        if (index == -1) {
-            System.out.println("Here is no negative values in array");
-            return 0;
-        }
-
-        for (int i = index; i < numbers.length; i++) {
-            result += numbers[i];
-        }
-
-        return result / (numbers.length - index);
-    }
-
-    public boolean contains(int value) {
-        for(int number : numbers) {
+    public static boolean contains(int value, int[] array) {
+        for(int number : array) {
             if (number == value) {
                 return true;
             }
