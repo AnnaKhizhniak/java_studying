@@ -2,112 +2,160 @@ package app;
 import java.util.*;
 
 public class Main {
+    public static final byte MIN = 1;
+    public static final byte MAX = 50;
+    public static final int SIZE = 4;
+
     public static void main(String[] args) {
-        byte min = 1;
-        byte max = 100;
-        int[] numbers = new int[15];
+        int[][] matrix = new int[SIZE][SIZE];
 
-        fillArrayWithRandoms(numbers, min, max);
-        System.out.println("Start array: " + Arrays.toString(numbers));
+        fillMatrixWithRandoms(matrix);
+        printMatrix(matrix);
 
-        sortInsertion(numbers);
-        System.out.println("Sorted array: " + Arrays.toString(numbers));
+        sumOddRows(matrix);
+        sumEvenRows(matrix);
 
-        Scanner scanner = new Scanner(System.in);
+        multiplyOddColumns(matrix);
+        multiplyEvenColumns(matrix);
+        System.out.println();
 
-        while (true) {
-            try {
-                System.out.println("Enter value from " + min + " to " + max + " for search: ");
-                int searchKey = scanner.nextInt();
-                scanner.nextLine();
+        isMagicSquare(matrix);
+    }
 
-                if (searchKey > max || searchKey < min) {
-                    System.out.println("Entered not valid value!");
-                } else {
-                    int index = searchValue(numbers, searchKey);
+    public static void isMagicSquare(int[][] matrix) {
+        int[] sumsOfRows = new int[SIZE];
+        int[] sumsOfColumns = new int[SIZE];
+        int[] sumsOfDiagonals = new int[2];
 
-                    if (index != -1) {
-                        System.out.println("Index for number " + searchKey + " in sorted array is: " + index);
-                        return;
-                    }
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                sumsOfRows[row] += matrix[row][col];
+                sumsOfColumns[row] += matrix[col][row];
 
-                    System.out.println("Number " + searchKey + " is not found in array!");
-
-                    while (true) {
-                       System.out.println("Want to try one more time? Y/N");
-                       String userResponse = scanner.nextLine().trim();
-
-                       if (userResponse.equalsIgnoreCase("y")) {
-                           break;
-                       }
-
-                       if (userResponse.equalsIgnoreCase("n")) {
-                           scanner.close();
-                           return;
-                       }
-
-                        System.out.println("Please enter Y or N.");
-                       }
-                    }
+                if (col == row) {
+                    sumsOfDiagonals[0] += matrix[row][col];
                 }
-            catch (InputMismatchException e) {
-                System.out.println("Please enter an integer number.");
-                scanner.nextLine();
+            }
+
+            if (row > 0 && sumsOfRows[row] != sumsOfRows[row-1]) {
+                System.out.println("This matrix is not magic square!");
+                return;
             }
         }
+
+        sumsOfDiagonals[1] += matrix[SIZE-1][0];
+        sumsOfDiagonals[1] += matrix[1][2];
+        sumsOfDiagonals[1] += matrix[2][1];
+        sumsOfDiagonals[1] += matrix[0][SIZE-1];
+
+        if (sumsOfDiagonals[0] != sumsOfDiagonals[1]) {
+            System.out.println("This matrix is not magic square!");
+            return;
+        }
+
+        for (int i = 0; i < SIZE; i++) {
+           for (int j = 0; j < SIZE; j++) {
+               if (sumsOfRows[i] != sumsOfColumns[j] || sumsOfColumns[j] != sumsOfDiagonals[0]) {
+                   System.out.println("This matrix is not magic square!");
+                   return;
+               }
+           }
+        }
+        System.out.println("This matrix is magic square!");
     }
 
-    public static void fillArrayWithRandoms(int[] array, int min, int max) {
-        int count = 0;
-        while (count < array.length) {
-            int randomNumber = (min + (int) (Math.random() * ((max - min) + 1)));
-            if (!contains(randomNumber, array)) {
-                array[count] = randomNumber;
-                count++;
+    public static void multiplyOddColumns(int[][] matrix) {
+        long result = 1L;
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                if (col % 2 != 0) {
+                    continue;
+                }
+
+                result *= matrix[row][col];
             }
+
         }
+        System.out.printf("Multiplication value result in the odd rows (row %s) is: %d%n", getIndexes("odd"), result);
     }
 
-    public static int searchValue(int[] array, int key) {
-        int left = 0;
-        int right = array.length - 1;
-
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-
-            if (array[mid] == key) {
-                return mid;
+    public static void multiplyEvenColumns(int[][] matrix) {
+        long result = 1L;
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                if (col % 2 == 0) {
+                    continue;
+                }
+                result *= matrix[row][col];
             }
 
-            if (array[mid] < key) {
-                left = mid + 1;
-            } else {
-                right = mid - 1;
-            }
         }
-        return -1;
+        System.out.printf("Multiplication value result in the even rows (row %s) is: %d%n", getIndexes("even"), result);
     }
 
-    public static void sortInsertion(int[] array) {
-        for (int i = 1; i < array.length; i++) {
-            int current = array[i];
-            int j = i - 1;
-
-            while (j >= 0 && array[j] > current) {
-                array[j+1] = array[j];
-                j = j - 1;
+    public static int sumOddRows(int[][] matrix) {
+        int result = 0;
+        for (int row = 0; row < SIZE; row++) {
+            if (row % 2 != 0) {
+                continue;
             }
-            array[j+1] = current;
+
+            for (int col = 0; col < SIZE; col++) {
+                result += matrix[row][col];
+            }
+
         }
+        System.out.printf("Sum in the odd rows (row %s) is: %d%n", getIndexes("odd"), result);
+        return result;
     }
 
-    public static boolean contains(int value, int[] array) {
-        for(int number : array) {
-            if (number == value) {
-                return true;
+    public static int sumEvenRows(int[][] matrix) {
+        int result = 0;
+        for (int row = 0; row < SIZE; row++) {
+            if (row % 2 == 0) {
+                continue;
+            }
+
+            for (int col = 0; col < SIZE; col++) {
+                result += matrix[row][col];
+            }
+
+        }
+        System.out.printf("Sum in the even rows (row %s) is: %d%n", getIndexes("even"), result);
+        return result;
+    }
+
+    public static void fillMatrixWithRandoms(int[][] matrix) {
+       Random random = new Random();
+
+       for (int row = 0; row < SIZE; row++) {
+           for (int col = 0; col < SIZE; col++) {
+                matrix[row][col] = random.nextInt(MIN, MAX);
+           }
+       }
+    }
+
+    public static void printMatrix(int[][] matrix) {
+        System.out.print("Matrix " + SIZE + "x" + SIZE + ":");
+        for (int row = 0; row < SIZE; row++) {
+            System.out.println();
+            for (int col = 0; col < SIZE; col++) {
+                System.out.print(matrix[row][col] + " ");
             }
         }
-        return false;
+        System.out.printf("%n%n");
+    }
+
+
+    private static String getIndexes(String rowType) {
+        String rows = "";
+        for (int i = 0; i < SIZE; i++) {
+            if (rowType.equalsIgnoreCase("even") == ((i + 1) % 2 == 0)) {
+                rows += i + ", ";
+            }
+        }
+        int index = rows.lastIndexOf(", ");
+        return rows.substring(0, index);
     }
 }
 
