@@ -15,8 +15,8 @@ public class Main {
         sumOddRows(matrix);
         sumEvenRows(matrix);
 
-        multiplyOddRows(matrix);
-        multiplyEvenRows(matrix);
+        multiplyOddColumns(matrix);
+        multiplyEvenColumns(matrix);
 
         isMagicSquare(matrix);
     }
@@ -63,55 +63,54 @@ public class Main {
         System.out.println("This matrix is magic square!");
     }
 
-    public static void multiplyEvenRows(int[][] matrix) {
+    public static void multiplyOddColumns(int[][] matrix) {
         long result = 1L;
         for (int row = 0; row < SIZE; row++) {
-            if (row % 2 != 0) {
-                continue;
-            }
-
             for (int col = 0; col < SIZE; col++) {
+                if (col % 2 != 0) {
+                    continue;
+                }
+
                 result *= matrix[row][col];
             }
 
         }
-        System.out.printf("Multiplication value result in the even rows (row %s) is: %d%n", getRowNumbers("even"), result);
+        System.out.printf("Multiplication value result in the odd rows (row %s) is: %d%n", getIndexes("odd"), result);
     }
 
-    public static void multiplyOddRows(int[][] matrix) {
+    public static void multiplyEvenColumns(int[][] matrix) {
         long result = 1L;
         for (int row = 0; row < SIZE; row++) {
-            if (row % 2 == 0) {
-                continue;
-            }
-
             for (int col = 0; col < SIZE; col++) {
+                if (col % 2 == 0) {
+                    continue;
+                }
                 result *= matrix[row][col];
             }
 
         }
-        System.out.printf("Multiplication value result in the odd rows (row %s) is: %d%n", getRowNumbers("odd"), result);
-    }
-
-    public static int sumEvenRows(int[][] matrix) {
-        int result = 0;
-        for (int row = 0; row < SIZE; row++) {
-            if (row % 2 != 0) {
-                continue;
-            }
-
-            for (int col = 0; col < SIZE; col++) {
-                result += matrix[row][col];
-            }
-
-        }
-        System.out.printf("Sum in the even rows (row %s) is: %d%n", getRowNumbers("even"), result);
-        return result;
+        System.out.printf("Multiplication value result in the even rows (row %s) is: %d%n", getIndexes("even"), result);
     }
 
     public static int sumOddRows(int[][] matrix) {
         int result = 0;
         for (int row = 0; row < SIZE; row++) {
+            if (row % 2 != 0) {
+                continue;
+            }
+
+            for (int col = 0; col < SIZE; col++) {
+                result += matrix[row][col];
+            }
+
+        }
+        System.out.printf("Sum in the odd rows (row %s) is: %d%n", getIndexes("odd"), result);
+        return result;
+    }
+
+    public static int sumEvenRows(int[][] matrix) {
+        int result = 0;
+        for (int row = 0; row < SIZE; row++) {
             if (row % 2 == 0) {
                 continue;
             }
@@ -121,7 +120,7 @@ public class Main {
             }
 
         }
-        System.out.printf("Sum in the odd rows (row %s) is: %d%n", getRowNumbers("odd"), result);
+        System.out.printf("Sum in the even rows (row %s) is: %d%n", getIndexes("even"), result);
         return result;
     }
 
@@ -147,7 +146,7 @@ public class Main {
     }
 
 
-    private static String getRowNumbers(String rowType) {
+    private static String getIndexes(String rowType) {
         String rows = "";
         for (int i = 0; i < SIZE; i++) {
             if (rowType.equalsIgnoreCase("even") == ((i + 1) % 2 == 0)) {
