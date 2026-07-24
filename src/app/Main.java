@@ -17,6 +17,7 @@ public class Main {
 
         multiplyOddColumns(matrix);
         multiplyEvenColumns(matrix);
+        System.out.println();
 
         isMagicSquare(matrix);
     }
